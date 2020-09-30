@@ -19,14 +19,18 @@ class DirectedCycle
 {
 private:
 
-   GraphType G;
+   const GraphType& G;
 
-   bool cycleDetected;
+   int cycleDetectedAt;
+   bool mustBeAdded;
    std::vector<bool> marked;
    std::vector<bool> stacked;
 
    std::list<int> cycle;
 
+   /*
+    * @brief Initialise les variables pour la détection de cycle.
+    */
    void Init (int v)
    {
       marked.resize(v);
@@ -35,9 +39,13 @@ private:
       stacked.resize(v);
       std::fill(stacked.begin(), stacked.end(), false);
 
-      cycleDetected = false;
+      cycleDetectedAt = -1;
+      mustBeAdded = true;
    }
 
+   /*
+    * @brief Lance le processus de récursion sur un sommet v pour chercher un cycle.
+    */
    void cycleDetection(int v)
    {
       marked[v] = true;
@@ -45,19 +53,22 @@ private:
 
       for(int w: G.adjacent(v))
       {
-         if(cycleDetected)
-         {
-            //Checker avec si true potentiellement.
-            cycle.push_front(v);
-            return;
-         }
-         else if(!marked[w])
+         if(!marked[w])
          {
             cycleDetection(w);
          }
          else if(stacked[w])
          {
-            cycleDetected = true;
+            cycleDetectedAt = w;
+            cycle.push_back(w);
+         }
+
+         if(cycleDetectedAt >= 0)
+         {
+           if(mustBeAdded) cycle.push_back(v);
+           if(cycleDetectedAt == v) mustBeAdded = false;
+
+           return;
          }
       }
       stacked[v] = false;
@@ -65,12 +76,18 @@ private:
 
 public:
 
-   // constructeur
+   /**
+    * @brief Effectue une détection de cycle sur le graphe donné.
+    * @param g Graphe a effectué la détection de cycle.
+    */
    DirectedCycle (const GraphType &g) : G(g)
    {
-      Init(g.V());
+      Init(G.V());
 
-      if(g.V()) cycleDetection(0);
+      for(int i = 0; i < G.V() && cycleDetectedAt < 0; ++i)
+      {
+         cycleDetection(i);
+      }
 
    }
 
@@ -80,10 +97,13 @@ public:
     */
    bool HasCycle ()
    {
-      return (bool) cycle.size();
+      return cycle.size() > 0;
    }
 
-   // liste les indexes des sommets formant une boucle
+   /**
+    * @brief Liste les indexes des sommets formant une boucle
+    * @return La liste des indexes.
+    */
    std::list<int> Cycle ()
    {
       return cycle;
