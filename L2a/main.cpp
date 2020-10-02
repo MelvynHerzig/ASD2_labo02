@@ -4,18 +4,37 @@
  *
  * Created on 3. novembre 2014, 08:23
  * Updated on 9. sept 2020 by Antoine Rochat
- * Modified by Berney Alec, Forestier Quentin, Herzig Melvyn on 30 Sep. 2020
+ * Modified on 02 Oct. 2020 by Berney Alec, Forestier Quentin, Herzig Melvyn
  */
 
 #include <cstdlib>
 #include <iostream>
 #include "DiGraph.h"
 #include "SymbolGraph.h"
-
-//vous pouvez reutiliser celui du labo 1, ex 2
 #include "TopologicalSort.h"
 
 using namespace std;
+
+/**
+ * @brief pour les entier entre begin et end, affiche le symbole associé dans g
+ * @tparam RandomAccessIterator Itérateur.
+ * @tparam grapheType Type du graphe.
+ * @param begin Itérateur de début.
+ * @param end Itérateur de fin.
+ * @param g Graphe.
+ * @return String concaténée avec les symboles
+ */
+template < typename RandomAccessIterator, typename grapheType >
+string symbolContained(RandomAccessIterator begin, RandomAccessIterator end,const SymbolGraph<grapheType>& g)
+{
+   string result = "";
+
+   for(auto i = begin; i != end; ++i)
+   {
+      result +=  g.symbol(*i) + " ";
+   }
+   return result;
+}
 
 bool checkOrder (const std::vector<int> &order,
                  const SymbolGraph<DiGraph> &SG,
@@ -74,39 +93,37 @@ int main (int argc, const char *argv[])
    {
       string filename(argv[i]);
 
-      SymbolGraph<DiGraph> G = {filename, delim};
+      SymbolGraph<DiGraph>   G  = {filename, delim};
       DirectedCycle<DiGraph> DC = {G.G()};
 
       if(DC.HasCycle())
       {
-         cout << filename << " n'est pas un DAG" << endl;
-         cout << "Cycle trouvé:"                 << endl;
-         std::list<int> cycles = DC.Cycle();
-         for (list<int>::iterator i = cycles.begin(); i != cycles.end(); ++i)
-         {
-            cout << G.symbol(*i);
-            if(i != cycles.end()) cout << " ";
-         }
+         cout << filename << " n'est pas un DAG" << endl
+              << "Cycle trouvé:"                 << endl;
+
+         std::list<int>& cycles = DC.Cycle();
+         cout << symbolContained(cycles.begin(), cycles.end(), G) << endl;
       }
       else
       {
          TopologicalSort<DiGraph> TS = {G.G()};
-         cout << filename << " est un DAG" << endl;
-         cout << "Ordre topologique:" << endl;
+
+         cout << filename << " est un DAG" << endl
+              << "Ordre topologique:"      << endl;
+
          const vector<int>& listnum = TS.Order();
-         for(int i : listnum)
-         {
-            cout << G.symbol(i) << " ";
-         }
-         cout << endl;
+         cout << symbolContained(listnum.begin(), listnum.end(), G) << endl;
+
          if(checkOrder(listnum, G, filename, delim))
          {
             cout << "Vérification réussie" << endl;
          }
+         else
+         {
+            cout << "Vérification échouée" << endl;
+         }
       }
 
    }
-
-
    return EXIT_SUCCESS;
 }

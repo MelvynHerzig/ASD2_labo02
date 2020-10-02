@@ -4,7 +4,7 @@
  *
  * Created on 08. octobre 2014, 14:07
  * Updated on 9 sept. by Antoine Rochat
- * Modified by Berney Alec, Forestier Quentin, Herzig Melvyn on 30 Sep. 2020
+ * Modified on 02 Oct. 2020 by Berney Alec, Forestier Quentin, Herzig Melvyn
  */
 
 #ifndef ASD2_TopologicalSort_h
@@ -16,14 +16,18 @@
 #include <vector>
 #include <exception>
 
+/*
+ * Nous considérons que le graphe référencé ne change pas.
+ * C'est pourquoi nous avons implémenté les opérations de tri topologique dans
+ * le constructeur. Si, les graphes référencés sont susceptibles de changer,
+ * il faudrait déplacer l'implémentation du constructeur à la fonction Order.
+ */
 template<typename GraphType>
 class TopologicalSort
 {
 private:
 
-   DirectedCycle<GraphType> DC;
    const GraphType& G;
-
    std::vector<int> order;
 
 public:
@@ -33,16 +37,23 @@ public:
     * @param g Graphe a trié topologiquement.
     * @throws GraphNotDAGException si le graphe contient un cycle
     */
-   TopologicalSort (const GraphType &g) : DC(g), G(g)
+   TopologicalSort (const GraphType &g) : G(g)
    {
+      DirectedCycle<GraphType> DC = {G};
       if(DC.HasCycle()) throw GraphNotDAGException(DC.Cycle());
+
+      GraphType GT = G.reverse();
+      DFSIter<GraphType> dfs (GT);
+      dfs.visitGraph([](int v) {}, [this](int v){order.push_back(v);});
+      std::reverse(order.begin(), order.end());
    }
 
-   // tableau contenant l'ordre de parcours des indexes des sommets dans le graphe
+   /**
+    * @brief Retourne le tableau contenant l'ordre topologique.
+    * @return Tableau d'ordre topologique.
+    */
    const std::vector<int>& Order ()
    {
-      DFSIter<GraphType> dfs (G);
-      dfs.visitGraph([](int v) {}, [this](int v){order.push_back(v);});
       return order;
    }
 

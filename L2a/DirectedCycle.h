@@ -4,7 +4,7 @@
  *
  * Created on 08. octobre 2014, 10:46
  * Classe permettant la detection de cycle sur un graphe oriente
- * Modified by Berney Alec, Forestier Quentin, Herzig Melvyn on 30 Sep. 2020
+ * Modified by Berney Alec, Forestier Quentin, Herzig Melvyn on 02 Oct. 2020
  */
 
 #ifndef ASD2_DirectedCycle_h
@@ -12,8 +12,13 @@
 
 #include <list>
 #include <vector>
-#include <stack>
 
+/*
+ *  Nous considérons que le graphe référencé ne change pas.
+ *  C'est pourquoi nous avons implémenté les opérations de vérification de cycle dans
+ *  le constructeur. Si, les graphes référencés sont susceptibles de changer,
+ *  il faudrait déplacer l'implémentation du constructeur à la fonction hasCycle.
+ */
 template<typename GraphType>
 class DirectedCycle
 {
@@ -21,8 +26,7 @@ private:
 
    const GraphType& G;
 
-   int cycleDetectedAt;
-   bool mustBeAdded;
+   bool cycleDetected;
    std::vector<bool> marked;
    std::vector<bool> stacked;
 
@@ -39,8 +43,7 @@ private:
       stacked.resize(v);
       std::fill(stacked.begin(), stacked.end(), false);
 
-      cycleDetectedAt = -1;
-      mustBeAdded = true;
+      cycleDetected = false;
    }
 
    /*
@@ -48,7 +51,7 @@ private:
     */
    void cycleDetection(int v)
    {
-      marked[v] = true;
+      marked [v] = true;
       stacked[v] = true;
 
       for(int w: G.adjacent(v))
@@ -59,14 +62,13 @@ private:
          }
          else if(stacked[w])
          {
-            cycleDetectedAt = w;
+            cycleDetected = true;
             cycle.push_back(w);
          }
 
-         if(cycleDetectedAt >= 0)
+         if(cycleDetected && cycle.front() != cycle.back() || cycle.size() == 1)
          {
-           if(mustBeAdded) cycle.push_back(v);
-           if(cycleDetectedAt == v) mustBeAdded = false;
+           cycle.push_back(v);
 
            return;
          }
@@ -84,11 +86,10 @@ public:
    {
       Init(G.V());
 
-      for(int i = 0; i < G.V() && cycleDetectedAt < 0; ++i)
+      for(int i = 0; i < G.V() && !cycleDetected; ++i)
       {
          cycleDetection(i);
       }
-
    }
 
    /**
@@ -97,14 +98,14 @@ public:
     */
    bool HasCycle ()
    {
-      return cycle.size() > 0;
+      return cycle.size() > 1;
    }
 
    /**
     * @brief Liste les indexes des sommets formant une boucle
     * @return La liste des indexes.
     */
-   std::list<int> Cycle ()
+   std::list<int>& Cycle ()
    {
       return cycle;
    }
