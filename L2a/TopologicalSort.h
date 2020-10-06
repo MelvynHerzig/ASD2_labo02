@@ -46,6 +46,13 @@ public:
       DFSIter<GraphType> dfs (GT);
       dfs.visitGraph([](int v) {}, [this](int v){order.push_back(v);});
       std::reverse(order.begin(), order.end());
+
+      /* Peut également être écrit de cette façon. Ceci débouche sur un ordre topologique
+       * mais il ne correspond pas au paterne du codecheck bien qu'il passe checkOrder.
+       *
+       * DFSIter<GraphType> dfs (G);
+       * dfs.visitGraph([](int v) {}, [this](int v){order.push_back(v);});
+       */
    }
 
    /**
