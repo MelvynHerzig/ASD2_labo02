@@ -67,10 +67,11 @@ public:
     * @param g Graphe.
     * @param gReverse Graphe transposé de g.
     */
-   KosarajuSharirCFC (const GraphType &g, const GraphType &gReverse)
+   KosarajuSharirCFC (const GraphType &g, const GraphType &gReverse): CFC<GraphType>()
    {
-      std::vector<int> postOrdre (g.V());
-      std::fill(this->id.begin(), this->id.end(), -1);
+      std::vector<int> postOrdre;
+      CFC<GraphType>::id.resize(g.V());
+      std::fill_n(CFC<GraphType>::id.begin(), g.V(), -1);
       unsigned noCFC = 0;
 
       DFSIter<GraphType> DFS  {g};
@@ -81,7 +82,7 @@ public:
 
       for(int i = 0; i < postOrdre.size(); ++i)
       {
-         if(this->id[postOrdre[i]] == -1)
+         if(CFC<GraphType>::Id(postOrdre[i]) == -1)
          {
             DFS.visit(postOrdre[i],[this, &noCFC](int v){this->id[v] = noCFC;}, [](int v) {});
             ++noCFC;
