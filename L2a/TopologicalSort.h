@@ -19,7 +19,7 @@
 /*
  * Nous considérons que le graphe référencé ne change pas.
  * C'est pourquoi nous avons implémenté les opérations de tri topologique dans
- * le constructeur. Si, les graphes référencés sont susceptibles de changer,
+ * le constructeur. Si, le graphe référencé est susceptibles de changer,
  * il faudrait déplacer l'implémentation du constructeur à la fonction Order.
  */
 template<typename GraphType>
@@ -35,7 +35,7 @@ public:
    /**
     * @brief Constructeur, vérifie si le graphe contient un cycle.
     * @param g Graphe a trié topologiquement.
-    * @throws GraphNotDAGException si le graphe contient un cycle
+    * @throws GraphNotDAGException si le graphe contient un cycle.
     */
    TopologicalSort (const GraphType &g) : G(g)
    {

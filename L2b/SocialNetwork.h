@@ -22,7 +22,7 @@ class SocialNetwork : public SymbolGraph<GraphType>
 
    typedef SymbolGraph<GraphType> BASE;
 
-   GraphType gReversed;
+   GraphType gReversed; //Pour respecter la complexité en O(S) de personsWhoFollows.
 
 public:
 
@@ -93,7 +93,7 @@ public:
     */
    std::vector<std::string> relationCircle (const std::string &name) const
    {
-      KosarajuSharirCFC<GraphType> cfc = {*BASE::g, BASE::g->reverse()};
+      KosarajuSharirCFC<GraphType> cfc = {*BASE::g, gReversed};
       int idBase = BASE::index(name);
       std::vector<std::string> amitie;
 

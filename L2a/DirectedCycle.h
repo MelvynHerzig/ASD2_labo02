@@ -46,8 +46,9 @@ private:
       cycleDetected = false;
    }
 
-   /*
+   /**
     * @brief Lance le processus de récursion sur un sommet v pour chercher un cycle.
+    * @param v Sommet de départ.
     */
    void cycleDetection(int v)
    {

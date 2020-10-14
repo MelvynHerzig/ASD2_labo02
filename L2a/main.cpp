@@ -16,7 +16,7 @@
 using namespace std;
 
 /**
- * @brief pour les entier entre begin et end, affiche le symbole associé dans g
+ * @brief Pour les entiers entre begin et end, affiche le symbole associé dans g
  * @tparam RandomAccessIterator Itérateur.
  * @tparam grapheType Type du graphe.
  * @param begin Itérateur de début.
@@ -96,7 +96,25 @@ int main (int argc, const char *argv[])
       SymbolGraph<DiGraph>   G  = {filename, delim};
       DirectedCycle<DiGraph> DC = {G.G()};
 
-      if(DC.HasCycle())
+      try
+      {
+         TopologicalSort<DiGraph> TS = {G.G()};
+
+         cout << filename << " est un DAG" << endl
+              << "Ordre topologique:" << endl;
+
+         const vector<int> &listnum = TS.Order();
+         cout << symbolContained(listnum.begin(), listnum.end(), G) << endl;
+
+         if (checkOrder(listnum, G, filename, delim))
+         {
+            cout << "Vérification réussie" << endl;
+         } else
+         {
+            cout << "Vérification échouée" << endl;
+         }
+      }
+      catch (TopologicalSort<DiGraph>::GraphNotDAGException e)
       {
          cout << filename << " n'est pas un DAG" << endl
               << "Cycle trouvé:"                 << endl;
@@ -104,26 +122,6 @@ int main (int argc, const char *argv[])
          std::list<int>& cycles = DC.Cycle();
          cout << symbolContained(cycles.begin(), cycles.end(), G) << endl;
       }
-      else
-      {
-         TopologicalSort<DiGraph> TS = {G.G()};
-
-         cout << filename << " est un DAG" << endl
-              << "Ordre topologique:"      << endl;
-
-         const vector<int>& listnum = TS.Order();
-         cout << symbolContained(listnum.begin(), listnum.end(), G) << endl;
-
-         if(checkOrder(listnum, G, filename, delim))
-         {
-            cout << "Vérification réussie" << endl;
-         }
-         else
-         {
-            cout << "Vérification échouée" << endl;
-         }
-      }
-
    }
    return EXIT_SUCCESS;
 }
